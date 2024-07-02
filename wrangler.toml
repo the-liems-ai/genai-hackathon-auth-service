@@ -1,0 +1,22 @@
+name = "js-auth"
+compatibility_date = "2023-12-01"
+node_compat = true
+
+# [vars]
+# SERVICE_URL = "http://localhost:8787/api/v1"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [[d1_databases]]
+# binding = "JS_AUTH_DB"
+# database_name = "js-auth"
+# database_id = "efaa203d-dcd9-48db-b3bb-b6f8fe2eea73"
+
+# [ai]
+# binding = "AI"
