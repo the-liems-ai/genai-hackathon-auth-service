@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      organization: {
+        Row: {
+          created_at: string
+          id: string
+          image: string | null
+          metadata: Json | null
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Relationships: []
+      }
+      organization_users: {
+        Row: {
+          created_at: string
+          id: number
+          is_owner: boolean | null
+          org_id: string
+          user_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          is_owner?: boolean | null
+          org_id: string
+          user_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          is_owner?: boolean | null
+          org_id?: string
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_users_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string

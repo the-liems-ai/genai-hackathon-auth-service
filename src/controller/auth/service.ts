@@ -123,7 +123,20 @@ const generateToken = async (user: any, secret: string) => {
 }
 
 const getUser = async (email: string, supabase: SupabaseClient) => {
-    return await supabase.from("users").select("*").eq("email", email)
+    return await supabase
+        .from("users")
+        .select(
+            `
+            *,
+            organizations:organization_users (
+                is_owner,
+                organization (
+                    *
+                )
+            )
+        `
+        )
+        .eq("email", email)
 }
 
 const createUser = async (user: any, supabase: SupabaseClient<Database>) => {
@@ -138,4 +151,27 @@ const createUser = async (user: any, supabase: SupabaseClient<Database>) => {
             locale: user.locale,
         })
         .select("*")
+}
+
+export const testSupabase = async (c: Context<{}, any, {}>) => {
+    const { SUPABASE_URL, SUPABASE_KEY } = env<typeof Env>(c)
+
+    const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
+
+    const { data } = await sp
+        .from("users")
+        .select(
+            `
+            *,
+            organizations:organization_users (
+                is_owner,
+                organization (
+                    *
+                )
+            )
+        `
+        )
+        .eq("email", "wolflavamc@gmail.com")
+
+    return c.json(data)
 }
