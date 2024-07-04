@@ -9,3 +9,12 @@ export class BadRequestException extends HTTPException {
         })
     }
 }
+
+export class ForbiddenException extends HTTPException {
+    constructor(message: string) {
+        super(403, {
+            message,
+            res: new ExceptionResponse(403, message, "Forbidden"),
+        })
+    }
+}

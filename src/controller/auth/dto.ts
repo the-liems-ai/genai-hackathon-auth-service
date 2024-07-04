@@ -14,13 +14,6 @@ export interface GoogleUser {
     locale: string
 }
 
-export interface Payload {
-    sub: string
-    email: string
-    name: string
-    exp: number
-}
-
 export enum Provider {
     GOOGLE = "google",
 }

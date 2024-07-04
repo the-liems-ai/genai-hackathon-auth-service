@@ -1,23 +1,16 @@
 import { Context } from "hono"
-import {
-    GoogleUser,
-    LoginRequest,
-    Payload,
-    Provider,
-    providersMap,
-} from "./dto"
+import { GoogleUser, LoginRequest, Provider, providersMap } from "./dto"
 import { env } from "hono/adapter"
 import { Env } from "../../types"
 import { google } from "worker-auth-providers"
-import { BadRequestException } from "../../exception/BadRequestException"
-import { SupabaseClient } from "@supabase/supabase-js"
+import { BadRequestException } from "../../exception/Exception"
 import { supabase } from "../../utils/supabase"
-import { Database, Tables } from "../../types/supabase"
-import { sign, verify } from "hono/jwt"
-import { tokenExpries } from "../../config/constant"
+import { Tables } from "../../types/supabase"
+import { createUser, getUser } from "../../repo/users"
+import { generateToken, getUserFromToken } from "../../utils"
 
 export const handleLogin = async (c: Context<{}, any, {}>) => {
-    const { provider, redirectAfterLogin }: LoginRequest = await c.req.json()
+    const { provider, redirectAfterLogin } = await c.req.json<LoginRequest>()
 
     if (!provider || !redirectAfterLogin) {
         throw new BadRequestException("Invalid request")
@@ -75,7 +68,7 @@ export const handleGoogleCallback = async (c: Context<{}, any, {}>) => {
 
     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
-    let userData = {}
+    let userData: Tables<"users">
     const data = await getUser(user.email, sp)
 
     if (!data || data.length === 0) {
@@ -99,110 +92,11 @@ export const handleVerifyToken = async (c: Context<{}, any, {}>) => {
 
     const { SUPABASE_URL, SUPABASE_KEY, JWT_SECRET } = env<typeof Env>(c)
 
-    try {
-        const { email }: Payload = await verify(token, JWT_SECRET)
+    const user = await getUserFromToken(token, {
+        SUPABASE_URL,
+        SUPABASE_KEY,
+        JWT_SECRET,
+    })
 
-        const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
-
-        const data = await getUser(email, sp)
-
-        return c.json(data![0])
-    } catch (e) {
-        throw new BadRequestException("Invalid token")
-    }
+    return c.json(user)
 }
-
-const generateToken = async (user: any, secret: string) => {
-    const payload = {
-        sub: user.id,
-        email: user.email,
-        name: user.name,
-        exp: tokenExpries,
-    }
-    return await sign(payload, secret)
-}
-
-const getUser = async (email: string, supabase: SupabaseClient) => {
-    return await supabase
-        .from("users")
-        .select(
-            `
-        *,
-        organizations:organization_users (
-            is_owner,
-            organization (
-                *
-            )
-        )
-    `
-        )
-        .eq("email", email)
-        .then(({ data }) => {
-            return data?.map((user) => {
-                return {
-                    ...user,
-                    organizations: user.organizations.map(
-                        (org: {
-                            organization: Tables<"organization">
-                            is_owner: boolean
-                        }) => {
-                            return {
-                                ...org.organization,
-                                is_owner: org.is_owner,
-                            }
-                        }
-                    ),
-                }
-            })
-        })
-}
-
-const createUser = async (user: any, supabase: SupabaseClient<Database>) => {
-    return await supabase
-        .from("users")
-        .insert({
-            email: user.email,
-            name: user.name,
-            given_name: user.given_name,
-            family_name: user.family_name,
-            picture: user.picture,
-            locale: user.locale,
-        })
-        .select("*")
-}
-
-// export const testSupabase = async (c: Context<{}, any, {}>) => {
-//     const { SUPABASE_URL, SUPABASE_KEY } = env<typeof Env>(c)
-
-//     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
-
-//     const data = await sp
-//         .from("users")
-//         .select(
-//             `
-//             *,
-//             organizations:organization_users (
-//                 is_owner,
-//                 organization (
-//                     *
-//                 )
-//             )
-//         `
-//         )
-//         .eq("email", "wolflavamc@gmail.com")
-//         .then(({ data }) => {
-//             return data?.map((user) => {
-//                 return {
-//                     ...user,
-//                     organizations: user.organizations.map((org) => {
-//                         return {
-//                             ...org.organization,
-//                             is_owner: org.is_owner,
-//                         }
-//                     }),
-//                 }
-//             })
-//         })
-
-//     return c.json(data)
-// }

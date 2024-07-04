@@ -6,3 +6,10 @@ export const Env: Record<string, string> = {
     SUPABASE_KEY: "SUPABASE_KEY",
     JWT_SECRET: "JWT_SECRET",
 }
+
+export interface Payload {
+    sub: string
+    email: string
+    name: string
+    exp: number
+}
