@@ -16,7 +16,7 @@ app.get("/callback", async (c: Context<{}, any, {}>) => {
     return await handleGoogleCallback(c)
 })
 
-app.post("/verify", async (c: Context<{}, any, {}>) => {
+app.get("/verify/:token", async (c: Context<{}, "/:token", {}>) => {
     return await handleVerifyToken(c)
 })
 

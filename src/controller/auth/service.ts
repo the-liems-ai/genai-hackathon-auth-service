@@ -83,8 +83,8 @@ export const handleGoogleCallback = async (c: Context<{}, any, {}>) => {
     return c.redirect(`${redirect}?token=${accessToken}`)
 }
 
-export const handleVerifyToken = async (c: Context<{}, any, {}>) => {
-    const { token } = await c.req.json()
+export const handleVerifyToken = async (c: Context<{}, "/:token", {}>) => {
+    const { token } = c.req.param()
 
     if (!token) {
         throw new BadRequestException("Invalid request")
