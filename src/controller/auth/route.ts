@@ -3,7 +3,7 @@ import {
     handleGoogleCallback,
     handleLogin,
     handleVerifyToken,
-    testSupabase,
+    // testSupabase,
 } from "./service"
 
 const app = new Hono()

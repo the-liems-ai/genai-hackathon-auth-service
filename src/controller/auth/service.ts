@@ -171,38 +171,38 @@ const createUser = async (user: any, supabase: SupabaseClient<Database>) => {
         .select("*")
 }
 
-export const testSupabase = async (c: Context<{}, any, {}>) => {
-    const { SUPABASE_URL, SUPABASE_KEY } = env<typeof Env>(c)
+// export const testSupabase = async (c: Context<{}, any, {}>) => {
+//     const { SUPABASE_URL, SUPABASE_KEY } = env<typeof Env>(c)
 
-    const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
+//     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
-    const data = await sp
-        .from("users")
-        .select(
-            `
-            *,
-            organizations:organization_users (
-                is_owner,
-                organization (
-                    *
-                )
-            )
-        `
-        )
-        .eq("email", "wolflavamc@gmail.com")
-        .then(({ data }) => {
-            return data?.map((user) => {
-                return {
-                    ...user,
-                    organizations: user.organizations.map((org) => {
-                        return {
-                            ...org.organization,
-                            is_owner: org.is_owner,
-                        }
-                    }),
-                }
-            })
-        })
+//     const data = await sp
+//         .from("users")
+//         .select(
+//             `
+//             *,
+//             organizations:organization_users (
+//                 is_owner,
+//                 organization (
+//                     *
+//                 )
+//             )
+//         `
+//         )
+//         .eq("email", "wolflavamc@gmail.com")
+//         .then(({ data }) => {
+//             return data?.map((user) => {
+//                 return {
+//                     ...user,
+//                     organizations: user.organizations.map((org) => {
+//                         return {
+//                             ...org.organization,
+//                             is_owner: org.is_owner,
+//                         }
+//                     }),
+//                 }
+//             })
+//         })
 
-    return c.json(data)
-}
+//     return c.json(data)
+// }
