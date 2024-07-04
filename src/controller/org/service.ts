@@ -10,6 +10,7 @@ import {
     GetOrgRequestParams,
     RemoveUserFromOrgRequest,
     TransferOwnershipRequest,
+    UpdateOrgRequest,
 } from "./dto"
 import {
     addUserToOrg,
@@ -18,6 +19,7 @@ import {
     getOrg,
     removeUserFromOrg,
     transferOwnership,
+    updateOrg,
 } from "../../repo/org"
 import { supabase } from "../../utils/supabase"
 import { env } from "hono/adapter"
@@ -57,6 +59,34 @@ export const handleCreateOrg = async (c: Context<{}, "/:orgId", {}>) => {
     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
     return c.json(await createOrg(name, user.id, sp))
+}
+
+export const handleUpdateOrg = async (c: Context<{}, "/:orgId", {}>) => {
+    const user = await getUserFromHeader(c)
+
+    const { orgId } = c.req.param()
+
+    const { name } = await c.req.json<UpdateOrgRequest>()
+
+    if (!name || name.trim() === "") {
+        throw new BadRequestException("Invalid name")
+    }
+
+    const isOwner = user.organizations.some(
+        (org) => org.id === orgId && org.is_owner
+    )
+
+    if (!isOwner) {
+        throw new ForbiddenException(
+            "You are not an owner of this organization"
+        )
+    }
+
+    const { SUPABASE_KEY, SUPABASE_URL } = env<typeof Env>(c)
+
+    const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
+
+    return c.json(await updateOrg(orgId, name, sp))
 }
 
 export const handleAddUserToOrg = async (c: Context<{}, "/:orgId", {}>) => {

@@ -7,6 +7,7 @@ import {
     handleLeaveOrg,
     handleRemoveUserFromOrg,
     handleTransferOwnership,
+    handleUpdateOrg,
 } from "./service"
 
 const app = new Hono()
@@ -17,6 +18,10 @@ app.get("/:orgId", async (c: Context<{}, "/:orgId", {}>) => {
 
 app.post("/", async (c: Context<{}, any, {}>) => {
     return await handleCreateOrg(c)
+})
+
+app.put("/:orgId", async (c: Context<{}, "/:orgId", {}>) => {
+    return await handleUpdateOrg(c)
 })
 
 app.put("/:orgId/add", async (c: Context<{}, any, {}>) => {

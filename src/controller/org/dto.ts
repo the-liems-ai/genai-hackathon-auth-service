@@ -7,6 +7,11 @@ export interface CreateOrgRequest {
     // logo: string
 }
 
+export interface UpdateOrgRequest {
+    name: string
+    // logo: string
+}
+
 export interface AddUserToOrgRequest {
     usersEmail: string[]
 }

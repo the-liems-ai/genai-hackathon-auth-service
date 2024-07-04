@@ -5,7 +5,7 @@ export const getOrg = async (
     orgId: string,
     supabase: SupabaseClient<Database>
 ) => {
-    return await supabase
+    const data = await supabase
         .from("organization")
         .select(
             `
@@ -30,6 +30,7 @@ export const getOrg = async (
                 }
             })
         })
+    return data![0]
 }
 
 export const createOrg = async (
@@ -50,6 +51,16 @@ export const createOrg = async (
         user_id: userId,
         is_owner: true,
     })
+
+    return getOrg(orgId, supabase)
+}
+
+export const updateOrg = async (
+    orgId: string,
+    name: string,
+    supabase: SupabaseClient<Database>
+) => {
+    await supabase.from("organization").update({ name }).eq("id", orgId)
 
     return getOrg(orgId, supabase)
 }
