@@ -2,6 +2,8 @@ name = "genai-hackathon-auth-service"
 compatibility_date = "2023-12-01"
 node_compat = true
 main = "./src/index.ts"
+account_id = "d46919b3b31b61ac349836b18c9ac671"
+
 # [vars]
 # SERVICE_URL = "http://localhost:8787/api/v1"
 
