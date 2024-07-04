@@ -12,7 +12,7 @@ import { google } from "worker-auth-providers"
 import { BadRequestException } from "../../exception/BadRequestException"
 import { SupabaseClient } from "@supabase/supabase-js"
 import { supabase } from "../../utils/supabase"
-import { Database } from "../../types/supabase"
+import { Database, Tables } from "../../types/supabase"
 import { sign, verify } from "hono/jwt"
 import { tokenExpries } from "../../config/constant"
 
@@ -76,7 +76,7 @@ export const handleGoogleCallback = async (c: Context<{}, any, {}>) => {
     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
     let userData = {}
-    const { data } = await getUser(user.email, sp)
+    const data = await getUser(user.email, sp)
 
     if (!data || data.length === 0) {
         const { data: newData } = await createUser(user, sp)
@@ -104,7 +104,7 @@ export const handleVerifyToken = async (c: Context<{}, any, {}>) => {
 
         const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
-        const { data } = await getUser(email, sp)
+        const data = await getUser(email, sp)
 
         return c.json(data![0])
     } catch (e) {
@@ -127,16 +127,34 @@ const getUser = async (email: string, supabase: SupabaseClient) => {
         .from("users")
         .select(
             `
-            *,
-            organizations:organization_users (
-                is_owner,
-                organization (
-                    *
-                )
+        *,
+        organizations:organization_users (
+            is_owner,
+            organization (
+                *
             )
-        `
+        )
+    `
         )
         .eq("email", email)
+        .then(({ data }) => {
+            return data?.map((user) => {
+                return {
+                    ...user,
+                    organizations: user.organizations.map(
+                        (org: {
+                            organization: Tables<"organization">
+                            is_owner: boolean
+                        }) => {
+                            return {
+                                ...org.organization,
+                                is_owner: org.is_owner,
+                            }
+                        }
+                    ),
+                }
+            })
+        })
 }
 
 const createUser = async (user: any, supabase: SupabaseClient<Database>) => {
@@ -158,7 +176,7 @@ export const testSupabase = async (c: Context<{}, any, {}>) => {
 
     const sp = supabase(SUPABASE_URL, SUPABASE_KEY)
 
-    const { data } = await sp
+    const data = await sp
         .from("users")
         .select(
             `
@@ -172,6 +190,19 @@ export const testSupabase = async (c: Context<{}, any, {}>) => {
         `
         )
         .eq("email", "wolflavamc@gmail.com")
+        .then(({ data }) => {
+            return data?.map((user) => {
+                return {
+                    ...user,
+                    organizations: user.organizations.map((org) => {
+                        return {
+                            ...org.organization,
+                            is_owner: org.is_owner,
+                        }
+                    }),
+                }
+            })
+        })
 
     return c.json(data)
 }
