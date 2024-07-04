@@ -1,10 +1,5 @@
 import { Context, Hono } from "hono"
-import {
-    handleGoogleCallback,
-    handleLogin,
-    handleVerifyToken,
-    // testSupabase,
-} from "./service"
+import { handleGoogleCallback, handleLogin, handleVerifyToken } from "./service"
 
 const app = new Hono()
 
@@ -20,7 +15,4 @@ app.get("/verify/:token", async (c: Context<{}, "/:token", {}>) => {
     return await handleVerifyToken(c)
 })
 
-// app.get("/test", async (c: Context<{}, any, {}>) => {
-//     return await testSupabase(c)
-// })
 export default app
