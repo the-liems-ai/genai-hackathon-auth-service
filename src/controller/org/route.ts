@@ -32,12 +32,12 @@ app.put("/:orgId/remove", async (c: Context<{}, any, {}>) => {
     return await handleRemoveUserFromOrg(c)
 })
 
-app.put("/:orgId/leave", async (c: Context<{}, any, {}>) => {
-    return await handleLeaveOrg(c)
-})
-
 app.put("/:orgId/transfer", async (c: Context<{}, any, {}>) => {
     return await handleTransferOwnership(c)
+})
+
+app.delete("/:orgId/leave", async (c: Context<{}, any, {}>) => {
+    return await handleLeaveOrg(c)
 })
 
 app.delete("/:orgId", async (c: Context<{}, any, {}>) => {
