@@ -1,8 +1,1 @@
-```
-npm install
-npm run dev
-```
-
-```
-npm run deploy
-```
+# [https://mind-gpt.online](https://mind-gpt.online)
