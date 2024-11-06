@@ -2,6 +2,16 @@ import { SupabaseClient } from "@supabase/supabase-js"
 import { Database } from "../types/supabase"
 import { GoogleUser } from "../controller/auth/dto"
 
+export const getUsers = async (
+    keyword: string,
+    supabase: SupabaseClient<Database>
+) => {
+    return await supabase
+        .from("users")
+        .select("*")
+        .like("email", `%${keyword}%`)
+}
+
 export const getUser = async (
     email: string,
     supabase: SupabaseClient<Database>
